@@ -1,0 +1,61 @@
+case_id,boundary_tested,claude_v02_category,claude_v02_score,claude_v02_identity_attack
+HC01,1v3,3,1,0
+HC02,1v3,3,1,0
+HC03,1v3,3,0,0
+HC04,1v3,3,0,0
+HC05,1v3,1,1,0
+HC06,1v3,3,1,0
+HC07,1v3,3,1,0
+HC08,1v3,3,1,0
+HC09,1v3,5,0,0
+HC10,1v3,3,1,0
+HC11,1v3,3,1,0
+HC12,1v3,1,1,0
+HC13,1v3,3,0,0
+HC14,1v3,3,0,0
+HC15,1v3,3,1,0
+HC16,1v2,5,0,0
+HC17,1v2,1,2,0
+HC18,1v2,2,2,0
+HC19,1v2,2,2,0
+HC20,1v2,1,2,0
+HC21,1v2,3,0,0
+HC22,1v2,3,0,0
+HC23,1v2,1,2,0
+HC24,1/2v4,2,3,1
+HC25,1/2v4,2,3,0
+HC26,1/2v4,3,1,0
+HC27,1/2v4,3,1,0
+HC28,1/2v4,2,2,0
+HC29,1/2v4,2,2,0
+HC30,1/2v4,2,2,0
+HC31,1/2v4,2,3,0
+HC32,3v5,3,1,0
+HC33,3v5,5,0,0
+HC34,3v5,5,0,0
+HC35,3v5,5,0,0
+HC36,3v5,3,1,0
+HC37,3v5,6,0,0
+HC38,sarcasm,3,1,0
+HC39,sarcasm,3,1,0
+HC40,sarcasm,3,0,0
+HC41,sarcasm,5,0,0
+HC42,sarcasm,5,0,0
+HC43,sarcasm,3,0,0
+HC44,accountability,3,0,0
+HC45,accountability,3,0,0
+HC46,accountability,2,3,0
+HC47,accountability,2,3,0
+HC48,accountability,3,0,0
+HC49,repair,6,-2,0
+HC50,repair,3,-2,0
+HC51,repair,6,-1,0
+HC52,repair,6,-2,0
+HC53,repair,3,-2,0
+HC54,non-political (sport),2,2,0
+HC55,non-political (everyday),3,1,0
+HC56,non-political (celebrity),1,1,0
+HC57,non-political (everyday),5,0,0
+HC58,non-political (workplace),3,0,0
+HC59,non-political (celebrity),2,2,0
+HC60,non-political (sport),1,1,0

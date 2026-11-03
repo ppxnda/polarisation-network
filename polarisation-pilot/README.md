@@ -9,6 +9,8 @@ Built 3 Nov 2026. Purpose: test whether punitive expression (codebook v0) can be
 | `codebook_v0.2.md` | The current codebook (v0.2, after the methods review). Text between `PROMPT START` and `PROMPT END` (HTML comments stripped) is the LLM system prompt, so one file serves human and machine coders. `codebook_v0.md` is kept unchanged for the record. |
 | `sample_bluesky.py` | Topic-stratified sample of 100 English Bluesky posts (9 strata, about half replies), with parent text. |
 | `label_pilot.py` | Gold template, cost estimate, sync test, Batch API submit/fetch, Krippendorff's alpha with bootstrap CIs, alpha by stratum, confusion matrix, minimal-pair `flip-audit`. `--codebook` picks the codebook file. |
+| `codebook_v0.2_dryrun.md`, `hard_cases_claude_v02_dryrun.csv` | Dry run of v0.2 on the 60 hard cases. The `expected_*` columns in `hard_cases.csv` are keyed to v0.1: re-key under v0.2 yourself **before** opening the dry-run CSV. |
+| `LEARNING.md` | Rebuild path with hand exercises (α, gain g, the fold) and answers |
 | `tests/` | `python -m pytest tests` (mocked API, no network). |
 | `requirements.txt` | Python dependencies. |
 
