@@ -6,7 +6,9 @@ Built 3 Nov 2026 to sit beside `polarisation-pilot/`. Same conventions: argparse
 |---|---|
 | `jetstream_sample.py` | Equal-probability sample of English posts from Jetstream over a time window, for prevalence (D1). |
 | `score_toxicity.py` | `score`: adds `tox_*` columns (Detoxify, optional Perspective). `iceberg`: share of punitive posts (category 1 or 2) below a toxicity threshold, bootstrap 95% CI. |
-| `tests/test_tools.py` | 34 offline pytest tests (synthetic Jetstream messages, fake scorers, a local websocket server). |
+| `tests/test_tools.py` | 35 offline pytest tests (synthetic Jetstream messages, fake scorers, a local websocket server). |
+| `sample_external.py` | Random hand-labelling sample from MFRC (Hugging Face) and CAD (ConvoKit), in `label_pilot.py` sample format, plus a separate key file of the source labels. |
+| `VALIDATION_2026-11-03.md` | Results of the first live run (Jetstream + Detoxify, ConvoKit CMV). Tool checks, not findings. |
 | `requirements.txt` | Dependencies. |
 
 ## Run order (Windows PowerShell)

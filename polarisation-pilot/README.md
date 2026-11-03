@@ -11,6 +11,7 @@ Built 3 Nov 2026. Purpose: test whether punitive expression (codebook v0) can be
 | `label_pilot.py` | Gold template, cost estimate, sync test, Batch API submit/fetch, Krippendorff's alpha with bootstrap CIs, alpha by stratum, confusion matrix, minimal-pair `flip-audit`. `--codebook` picks the codebook file. |
 | `codebook_v0.2_dryrun.md`, `hard_cases_claude_v02_dryrun.csv` | Dry run of v0.2 on the 60 hard cases. The `expected_*` columns in `hard_cases.csv` are keyed to v0.1: re-key under v0.2 yourself **before** opening the dry-run CSV. |
 | `LEARNING.md` | Rebuild path with hand exercises (α, gain g, the fold) and answers |
+| `pilot_samples/` | 150 external Reddit comments (MFRC + CAD, CC BY 4.0) for hand-labelling, plus Claude's practice labels under v0.2. Read its README before opening the labels. |
 | `tests/` | `python -m pytest tests` (mocked API, no network). |
 | `requirements.txt` | Python dependencies. |
 

@@ -474,3 +474,18 @@ def test_real_websockets_against_local_server(tmp_path):
     s, stats = asyncio.run(main())
     assert stats["stop_reason"] == "max_posts" and s.n_kept == 5
     assert seen_paths[0] == "/subscribe?wantedCollections=app.bsky.feed.post"
+
+
+# ---------------------------------------------------------------------------- external sample (MFRC + CAD)
+def test_sample_external_mfrc_dedups_and_cad_parent_lookup(tmp_path):
+    import sample_external as se
+    raw = pd.DataFrame({"text": ["a", "a", "b", "c", ""], "subreddit": ["x", "x", "y", "z", "z"],
+                        "bucket": "B", "annotator": ["1", "2", "1", "1", "1"],
+                        "annotation": ["Care", "Non-Moral", "Purity", "Non-Moral", "Care"]})
+    raw.to_parquet(tmp_path / "m.parquet")
+    s, k = se.sample_mfrc(tmp_path / "m.parquet", 3, seed=0)
+    assert sorted(s["text"]) == ["a", "b", "c"] and s["post_id"].is_unique and list(s.columns) == se.COLS
+    assert k.set_index("post_id").loc[s.set_index("text").loc["a", "post_id"], "mfrc_annotations"] == "Care; Non-Moral"
+    text = {"p1-post": "the post", "c1": "a comment"}
+    assert se.parent_text("p1", text) == "the post" and se.parent_text("c1", text) == "a comment"
+    assert se.parent_text(None, text) == "" and se.parent_text("gone", text) == ""

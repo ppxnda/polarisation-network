@@ -1,0 +1,151 @@
+post_id,category,punitive_score,identity_attack,confidence,rationale,coder,codebook,run
+cad_eopb9mx,6,0,False,high,Argument about posting behaviour and paid accounts; no moral wrong attributed to the person addressed.,claude,codebook_v0.2.md,practice
+cad_egvyev5,3,0,False,low,Sardonic jab implying the parent's targets suppress inconvenient facts (dishonesty); no cue (a)-(f).,claude,codebook_v0.2.md,practice
+cad_ek0rp9f,5,0,False,low,Sarcastic claim that something is a mental illness; no parent shows the target or any wrong. identity_attack not coded because the text does not name an identity.,claude,codebook_v0.2.md,practice
+mfrc_a2133fa321,3,1,False,medium,Accuses a 'troll' of propaganda (dishonesty) with contempt; 'watch close kids' addresses onlookers but does not mobilise against the target.,claude,codebook_v0.2.md,practice
+cad_et4hp5s,6,0,False,high,Factual disagreement about psychiatric hospitals.,claude,codebook_v0.2.md,practice
+mfrc_dbf4297c78,6,0,False,medium,Argument about capitalism and work; no wrong attributed to the addressee.,claude,codebook_v0.2.md,practice
+mfrc_11f47fa0ae,6,0,False,high,Rhetorical question about polling.,claude,codebook_v0.2.md,practice
+mfrc_50e60c4715,3,0,False,low,Normative claim that public restrooms should exist (fairness for disabled people); no identifiable target.,claude,codebook_v0.2.md,practice
+mfrc_1a5e255c78,3,0,False,medium,Suggests liberal establishment would embrace xenophobia for money; moral criticism without cues.,claude,codebook_v0.2.md,practice
+mfrc_093fe5d8cb,3,0,False,medium,Predicts prison for an alleged criminal and 'co-conspirators'; prosecution is proportionate process; no relish stated.,claude,codebook_v0.2.md,practice
+cad_eq444vx,6,0,False,high,Moderation information.,claude,codebook_v0.2.md,practice
+mfrc_fde9b6e75b,6,0,False,low,'Genuine question' insinuating electoral irregularity; no explicit moral judgement.,claude,codebook_v0.2.md,practice
+mfrc_e79c48f838,3,-1,False,medium,Criticises commenters' lack of compassion and defends the OP's standing.,claude,codebook_v0.2.md,practice
+cad_ek6isqc,3,1,False,medium,Sarcastic accusation of virtue signalling (hypocrisy) with contempt; no cue.,claude,codebook_v0.2.md,practice
+cad_ehj0k9p,6,0,False,high,Answer to a question.,claude,codebook_v0.2.md,practice
+mfrc_995f12bfab,6,0,False,high,Nostalgic humour.,claude,codebook_v0.2.md,practice
+cad_eq94o0f,5,0,False,low,Jokey hostility about people being happy; no moral wrong.,claude,codebook_v0.2.md,practice
+mfrc_1d3be883fb,6,0,False,medium,Personal preference about game characters.,claude,codebook_v0.2.md,practice
+cad_ekh34c7,6,0,False,low,Historical claim about a Zoroastrian practice in a thread about royal inbreeding; read as trivia rather than a stereotype of the religion.,claude,codebook_v0.2.md,practice
+cad_epif93f,3,1,False,medium,Likens the target's view to white supremacist belief; guilt-by-association moral criticism without cues.,claude,codebook_v0.2.md,practice
+mfrc_3c89bb1372,6,0,False,high,Election poll comment.,claude,codebook_v0.2.md,practice
+mfrc_756b3c53bc,3,0,False,medium,Suspects the girlfriend of mistreating the cats (cruelty); judgement without cues.,claude,codebook_v0.2.md,practice
+mfrc_93ad65577f,6,0,False,high,Film trivia.,claude,codebook_v0.2.md,practice
+mfrc_d364286526,5,0,False,medium,Calls voters the dumbest people on earth for voting against their interests; stupidity is not a moral wrong.,claude,codebook_v0.2.md,practice
+mfrc_d2b41cb4fb,3,1,False,low,'Snake oil salesman' imputes dishonesty alongside policy criticism; contempt but no cue.,claude,codebook_v0.2.md,practice
+mfrc_1b4a319fce,5,0,True,medium,"Equates Evangelicals with morons: identity_attack (religion); no moral wrong, so category 5.",claude,codebook_v0.2.md,practice
+cad_etqd3qz,6,0,False,high,Mild preference between companies.,claude,codebook_v0.2.md,practice
+mfrc_4bcd79a4d1,6,0,False,medium,Positive statement about class consciousness.,claude,codebook_v0.2.md,practice
+mfrc_35ebcfba6d,6,0,False,high,Comment on a video series.,claude,codebook_v0.2.md,practice
+mfrc_3bec624ab1,6,0,False,high,Personal anecdote.,claude,codebook_v0.2.md,practice
+mfrc_db8b8493c8,3,0,False,medium,"Calls a policy proposal racist; moral criticism of a proposal, no cues.",claude,codebook_v0.2.md,practice
+cad_em280iw,6,0,False,high,Friendly joke.,claude,codebook_v0.2.md,practice
+cad_emjm22x,5,0,False,low,Mocks a candidate's election loss to a meme; the ridiculed conduct is not framed as a moral wrong.,claude,codebook_v0.2.md,practice
+mfrc_b1a4e9c244,6,0,False,medium,Descriptive political claim.,claude,codebook_v0.2.md,practice
+mfrc_168907910f,3,0,False,medium,Moralising about the system lining the pockets of the higher class; class is not protected; no target individual.,claude,codebook_v0.2.md,practice
+cad_eifq5m7,5,0,False,medium,Dismisses 'X is cancelled' posts as lame; hostility about a practice without a moral wrong; anti-punitive in stance.,claude,codebook_v0.2.md,practice
+cad_epuyco1,6,0,False,low,"Argues asexual people do not belong under the pride umbrella; civil argument, no demeaning language, so identity_attack false.",claude,codebook_v0.2.md,practice
+mfrc_fa20a189c4,5,0,False,low,French; personal sniping at another commenter's fixation; no moral wrong.,claude,codebook_v0.2.md,practice
+mfrc_5b84bf0448,6,0,False,high,Joke.,claude,codebook_v0.2.md,practice
+mfrc_a8ae9afeb0,6,0,False,high,Link share.,claude,codebook_v0.2.md,practice
+mfrc_c6cfd97876,6,0,False,high,Factual claim about voters.,claude,codebook_v0.2.md,practice
+cad_einzwp6,6,0,False,high,Description of video evidence.,claude,codebook_v0.2.md,practice
+mfrc_512a498cc3,3,1,True,medium,Sarcastically attributes hypocrisy to Christianity itself: identity_attack (religion); moral criticism without desert claim.,claude,codebook_v0.2.md,practice
+mfrc_ec74f199ef,3,-1,False,medium,Says the OP's acts merit confession and apology while affirming the OP deserves forgiveness; proportionate and solidaric.,claude,codebook_v0.2.md,practice
+cad_ejjofug,6,0,False,high,Reply about links.,claude,codebook_v0.2.md,practice
+mfrc_267dea8692,3,0,False,medium,Moral judgement about fascism and jingoism; no individual target; recognises populists as potential allies.,claude,codebook_v0.2.md,practice
+mfrc_a1804ac5d6,3,0,False,medium,Calls Le Pen racist and says she should be prosecuted for hate speech (proportionate process); sympathy for victims; no cue.,claude,codebook_v0.2.md,practice
+mfrc_895a6cfcf1,6,0,False,high,Electoral analysis.,claude,codebook_v0.2.md,practice
+cad_eisdd22,3,0,False,low,Conspiratorial claim that TPTB manipulate the narrative; moral judgement with no identifiable target.,claude,codebook_v0.2.md,practice
+mfrc_fffa209663,6,0,False,medium,Factual defence of a politician's record.,claude,codebook_v0.2.md,practice
+cad_eky4ri3,3,0,False,medium,Argues mocking fat women is not progress; moral criticism of the parent's view without cues.,claude,codebook_v0.2.md,practice
+cad_ekwimli,3,0,False,low,Says life is ruined by assholes; vague moral judgement with no identifiable target.,claude,codebook_v0.2.md,practice
+mfrc_edc2c72467,6,0,False,low,Analysis of Le Pen's motive (nationalism); no moral wrong asserted.,claude,codebook_v0.2.md,practice
+cad_ejmah46,5,0,False,medium,Defensive hostile reply ('stfu') about drive-through etiquette; per D3 default the breach is not a moral wrong.,claude,codebook_v0.2.md,practice
+mfrc_d14d22f91a,6,0,False,high,Personal disclosure about work and mental health.,claude,codebook_v0.2.md,practice
+mfrc_6900942342,3,0,False,low,Unhedged allegation that Putin bankrolls Le Pen (corruption); no cues.,claude,codebook_v0.2.md,practice
+mfrc_03a34925a9,6,0,False,high,Argument about wanting the option not to work for others.,claude,codebook_v0.2.md,practice
+mfrc_7f6340f9f9,6,0,False,high,Factual correction.,claude,codebook_v0.2.md,practice
+mfrc_a29dbe5cee,6,0,False,low,Calls behaviour strange; no hostility or moral wrong.,claude,codebook_v0.2.md,practice
+mfrc_b585f1e808,3,1,False,medium,Condemns the OP's theft from a small business with disgust; no cue (a)-(f).,claude,codebook_v0.2.md,practice
+cad_ephq94x,5,0,False,medium,Calls a YouTuber a clown for diluting a historical name; no moral wrong.,claude,codebook_v0.2.md,practice
+cad_eq2ol2y,6,0,False,high,Balanced anecdote about meeting people online.,claude,codebook_v0.2.md,practice
+cad_ei92nls,6,0,False,high,Clarifies what a post meant.,claude,codebook_v0.2.md,practice
+mfrc_da9ad4cf68,6,-1,False,medium,Recognises good done by anyone regardless of side.,claude,codebook_v0.2.md,practice
+mfrc_574e24a573,3,0,False,medium,Moral pressure on abstainers for enabling Le Pen; no cues.,claude,codebook_v0.2.md,practice
+mfrc_62bf26a2dd,6,0,False,high,Political prediction.,claude,codebook_v0.2.md,practice
+mfrc_d4d9711811,6,0,False,high,Poll statistics.,claude,codebook_v0.2.md,practice
+mfrc_f156ac0143,6,0,False,medium,Defends a hiring decision as legitimate.,claude,codebook_v0.2.md,practice
+mfrc_6f7415eb11,3,0,False,low,Frames lobbying as rent-seeking at workers' expense (unfairness); no individual target.,claude,codebook_v0.2.md,practice
+cad_ek5r46p,6,0,False,medium,Personal defence of a banned subreddit.,claude,codebook_v0.2.md,practice
+cad_eof6xlw,5,0,False,medium,"Calls the target's long post cringe and self-righteous; contempt about style, not a moral wrong.",claude,codebook_v0.2.md,practice
+mfrc_4a5480b7f0,6,0,False,medium,"Criticises an argument as incoherent; mild, no moral wrong.",claude,codebook_v0.2.md,practice
+mfrc_849d5602d2,6,0,False,high,Joke.,claude,codebook_v0.2.md,practice
+cad_emqgfsp,3,1,False,low,Sneers that the parent's violent 'reds' have never done manual labour (hypocrisy); contempt without cue.,claude,codebook_v0.2.md,practice
+cad_ery3pe3,3,0,False,medium,Calls out anti-gay hate speech; criticises identity hate rather than committing it.,claude,codebook_v0.2.md,practice
+mfrc_03d81bc5a4,6,0,False,high,Explanatory analysis of legal risk.,claude,codebook_v0.2.md,practice
+mfrc_a935ee07b0,5,0,False,medium,Mocks a handshake with 'get cucked'; no moral wrong.,claude,codebook_v0.2.md,practice
+mfrc_7363f15aab,3,0,False,low,NTA verdict criticising the wife's lack of respect; mild moral criticism.,claude,codebook_v0.2.md,practice
+cad_eife7ba,3,1,False,medium,"Sarcastically accuses blue-check accounts of a double standard; contempt, no cue.",claude,codebook_v0.2.md,practice
+cad_ekr5923,6,0,False,high,Argument about censorship mechanisms.,claude,codebook_v0.2.md,practice
+cad_egdpx7z,6,0,False,high,Comment on a video.,claude,codebook_v0.2.md,practice
+mfrc_466d7e4257,6,0,False,high,Nostalgic comment.,claude,codebook_v0.2.md,practice
+cad_eisi7o1,6,0,False,high,Factual disagreement.,claude,codebook_v0.2.md,practice
+mfrc_aa45af62e1,6,0,False,high,Personal political introduction.,claude,codebook_v0.2.md,practice
+mfrc_01db8c5481,6,-1,False,low,Self-directed blame and reported apology; self-directed is category 6.,claude,codebook_v0.2.md,practice
+mfrc_794d3178db,3,1,False,medium,Sarcasm implying Le Pen lies; contempt without cue.,claude,codebook_v0.2.md,practice
+mfrc_8aa5b63a7f,6,0,False,high,Definitional point about side hustles.,claude,codebook_v0.2.md,practice
+cad_ekqe6gk,5,0,False,low,Sneering quip about a subreddit; parent removed so the target and any wrong are unknown.,claude,codebook_v0.2.md,practice
+mfrc_3ba41af257,3,1,False,medium,Unhedged allegation that the BLM organisation is terrorist; a movement or organisation is not a protected identity and the text separates it from the movement.,claude,codebook_v0.2.md,practice
+mfrc_f7bd4a63ff,3,0,False,high,Demands resignation (proportionate) out of shame at politicians; no cue.,claude,codebook_v0.2.md,practice
+mfrc_54ee588505,6,0,False,high,Electoral observation.,claude,codebook_v0.2.md,practice
+mfrc_07d3059cae,3,0,False,medium,Demands the media be put on trial for lies; prosecution is proportionate process in the codebook's terms.,claude,codebook_v0.2.md,practice
+mfrc_f56a539cc1,3,0,False,low,"Conditional criticism of enablers 'as alleged'; hedged, no cue.",claude,codebook_v0.2.md,practice
+mfrc_b21c346f5d,1,1,False,low,'Crime against humanity' that 'should be dealt with very firmly': vague unnamed sanction beyond process (implied sanction).,claude,codebook_v0.2.md,practice
+mfrc_7acac5cc60,3,-2,False,medium,"Defends the OP against name-callers; condemnation of the name-callers has no cue, so the score follows the defence.",claude,codebook_v0.2.md,practice
+cad_enzmp79,3,1,False,low,Sarcastic jibe at people expecting others to pay for birth control (entitlement); contempt without cue.,claude,codebook_v0.2.md,practice
+mfrc_655dced806,3,0,False,medium,Accuses an unnamed group of hypocrisy on police and rights.,claude,codebook_v0.2.md,practice
+mfrc_da36556b37,3,1,False,medium,Says the commenter lacks sensitivity and empathy and shows superiority; criticism of person without cue.,claude,codebook_v0.2.md,practice
+mfrc_05c112e069,6,0,False,high,Legal anecdote.,claude,codebook_v0.2.md,practice
+mfrc_ed402a5fec,6,0,False,low,Relationship advice listing red flags; no moral wrong asserted.,claude,codebook_v0.2.md,practice
+mfrc_326c1a2173,6,0,False,high,Political analysis question.,claude,codebook_v0.2.md,practice
+mfrc_1c512ccce1,6,0,False,high,Political analysis.,claude,codebook_v0.2.md,practice
+mfrc_748304f831,3,1,False,low,Urges cutting the 'asshole' out of one's life after a 'garbage' remark; personal exclusion is proportionate (personal boycott); contempt without cue.,claude,codebook_v0.2.md,practice
+cad_eiru2jj,6,0,False,low,Labels own side intelligent and objective; no target or wrong.,claude,codebook_v0.2.md,practice
+mfrc_2947c4a3df,3,1,False,medium,Calls the Le Pens traitorous fascists (betrayal) with contempt; family and party are not protected; no cue.,claude,codebook_v0.2.md,practice
+mfrc_36448c211b,6,0,False,medium,Personal comment on communication.,claude,codebook_v0.2.md,practice
+mfrc_79085fe7c2,6,0,False,high,Policy question.,claude,codebook_v0.2.md,practice
+cad_emw69x1,6,0,False,high,In-game joke.,claude,codebook_v0.2.md,practice
+mfrc_aa87e305ca,6,0,False,high,Analysis question.,claude,codebook_v0.2.md,practice
+cad_efr6z35,6,0,False,low,Jokey retort.,claude,codebook_v0.2.md,practice
+cad_ejrqiv0,6,0,False,high,Request for more content.,claude,codebook_v0.2.md,practice
+mfrc_f36600002b,3,1,False,low,"Contemptuous condemnation of controlling behaviour with a wish that the ex ghosts him; the wished outcome is personal exclusion by the victim (proportionate), and there is no cue.",claude,codebook_v0.2.md,practice
+mfrc_bf0c4c4d20,6,0,False,medium,Argument about repetitive work with a mild jab.,claude,codebook_v0.2.md,practice
+mfrc_2c2f588e4b,6,0,False,high,Economic argument.,claude,codebook_v0.2.md,practice
+mfrc_a8a8154fbf,6,0,False,medium,Wry quip about job hunting.,claude,codebook_v0.2.md,practice
+cad_ejf5tb1,5,0,False,medium,"'Eww' at living with people; hostile, no moral wrong.",claude,codebook_v0.2.md,practice
+mfrc_e015066fd6,6,0,False,high,Praise.,claude,codebook_v0.2.md,practice
+mfrc_f96dc9d0db,6,0,False,high,Clarifying question.,claude,codebook_v0.2.md,practice
+cad_ek65rx6,5,0,False,medium,Mocks Jordan Peterson's fans for gullibility; not a moral wrong.,claude,codebook_v0.2.md,practice
+mfrc_d072e8c583,5,0,False,medium,Exasperation that people do not read the article; no moral wrong.,claude,codebook_v0.2.md,practice
+cad_ei341rc,5,0,False,medium,"Mocks r/politics users as 'unfuckable neckbeards' and bots; contempt about who they are, not a moral wrong.",claude,codebook_v0.2.md,practice
+mfrc_b2ce5fe653,6,0,False,high,News report.,claude,codebook_v0.2.md,practice
+mfrc_5c69600e1c,6,0,False,high,Factual comment.,claude,codebook_v0.2.md,practice
+mfrc_b5a6dc3657,3,1,False,medium,"Sarcastic edit accusing Le Pen of disguising racism and antisemitism; moral criticism with contempt, no cue.",claude,codebook_v0.2.md,practice
+mfrc_32185b1056,3,0,False,low,Alludes to Russian-backed attacks and slander against Macron; moral judgement without cue.,claude,codebook_v0.2.md,practice
+cad_elky7qr,5,0,True,medium,"Homophobic slur applied to a person: identity_attack; no moral wrong, so category 5.",claude,codebook_v0.2.md,practice
+mfrc_7c26e36164,6,0,False,high,Positive remark.,claude,codebook_v0.2.md,practice
+cad_ejdgdhx,6,0,False,high,Political discussion.,claude,codebook_v0.2.md,practice
+cad_en752jl,6,0,False,high,Absurdist joke.,claude,codebook_v0.2.md,practice
+mfrc_deda953da3,3,0,False,medium,Says the person shifts blame and justifies doing something illegal; moral criticism without cue.,claude,codebook_v0.2.md,practice
+mfrc_0b13596948,3,0,False,medium,Sarcastic criticism of a double standard on civility; no cue.,claude,codebook_v0.2.md,practice
+cad_elwoedv,6,0,False,medium,Sympathy over a ban.,claude,codebook_v0.2.md,practice
+cad_el2tfot,6,0,False,low,One-word remark; context unknown.,claude,codebook_v0.2.md,practice
+mfrc_032a990799,6,0,False,high,Joke.,claude,codebook_v0.2.md,practice
+mfrc_5f4a708d7d,6,0,False,high,Electoral analysis.,claude,codebook_v0.2.md,practice
+cad_eouymwb,6,0,False,low,Provocative one-liner endorsing fascism; no target or wrong attributed.,claude,codebook_v0.2.md,practice
+mfrc_590a55e123,3,1,False,low,"Calls Melenchon a terrible human being for mocking a government after terror attacks (cruelty) plus insults; no cue. The ableist insult targets a policy, so identity_attack is false (low confidence).",claude,codebook_v0.2.md,practice
+cad_ehfdwlq,6,0,False,medium,Disputes an estimate.,claude,codebook_v0.2.md,practice
+cad_esew31p,6,0,False,high,Question.,claude,codebook_v0.2.md,practice
+mfrc_eb1e6cb79c,6,0,False,high,Personal reaction.,claude,codebook_v0.2.md,practice
+mfrc_b83dee2707,6,0,False,high,Supportive comment.,claude,codebook_v0.2.md,practice
+cad_ekgl9w2,6,0,False,medium,In-joke about pinging a user.,claude,codebook_v0.2.md,practice
+mfrc_ad6cb5d3be,3,0,False,medium,Points out he knows his mockery embarrasses her; mild moral criticism.,claude,codebook_v0.2.md,practice
+mfrc_b7518eab2d,6,0,False,high,Personal preference about waste.,claude,codebook_v0.2.md,practice
+mfrc_128c0b9730,6,0,False,high,Gratitude.,claude,codebook_v0.2.md,practice
+mfrc_7e55de2e77,6,0,False,medium,Questions unproven allegations and asks for sources.,claude,codebook_v0.2.md,practice
+mfrc_76bfa83301,3,1,False,medium,Calls Confederates traitors who fought for slavery and dismisses the interlocutor's 'bullshit'; moral criticism without cue.,claude,codebook_v0.2.md,practice
+mfrc_def570334d,3,1,True,low,"Sarcastically attributes a bad practice to 'their culture': read as a stereotype of an ethnic or national group, so identity_attack (low confidence); moral criticism without cue.",claude,codebook_v0.2.md,practice
+mfrc_a12f9a528f,6,0,False,medium,Supportive warning from personal experience of abuse.,claude,codebook_v0.2.md,practice
+mfrc_bbf58df560,3,0,False,low,Implies the Ugandan government censors one side; mild moral judgement.,claude,codebook_v0.2.md,practice
