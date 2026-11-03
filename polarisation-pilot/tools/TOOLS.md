@@ -6,7 +6,7 @@ Built 3 Nov 2026 to sit beside `polarisation-pilot/`. Same conventions: argparse
 |---|---|
 | `jetstream_sample.py` | Equal-probability sample of English posts from Jetstream over a time window, for prevalence (D1). |
 | `score_toxicity.py` | `score`: adds `tox_*` columns (Detoxify, optional Perspective). `iceberg`: share of punitive posts (category 1 or 2) below a toxicity threshold, bootstrap 95% CI. |
-| `tests/test_tools.py` | 32 offline pytest tests (synthetic Jetstream messages, fake scorers, a local websocket server). |
+| `tests/test_tools.py` | 34 offline pytest tests (synthetic Jetstream messages, fake scorers, a local websocket server). |
 | `requirements.txt` | Dependencies. |
 
 ## Run order (Windows PowerShell)
@@ -40,6 +40,8 @@ Check `.meta.json` after every run: `kept / english_posts_seen` should be close 
 - **Pseudonymisation** covers the author and the DID inside every `at://` URI (`uri`, `parent_uri`, `root_uri`, `quote_uri`), using the pilot's `sha256(salt + did)[:12]`. Links within the dataset still join. The cost: you cannot rehydrate a parent's text from the API later. If you need parent text for D1, that is a design decision (store raw URIs privately), not a flag to flip casually.
 - **`time_us` vs `created_at`.** `created_at` is client-claimed and can be backdated. Define windows on `time_us`.
 - **Reconnects** use `cursor = last time_us - 3 s` and de-duplicate on URI, so a replay never re-rolls the thinning coin.
+- **Empty text.** Image-only posts have empty `text`; Detoxify scores them near 0, so they inflate any "share below threshold". Drop or report them separately.
+- **Unlabelled baseline.** `iceberg --all-posts` gives the share of *all* posts below each threshold (no labels needed). `score --drop-text` writes scores without the post text.
 - **Iceberg CI** is a percentile bootstrap. `--cluster-col did` resamples authors instead of posts. Use it for Jetstream data, where heavy posters make posts non-independent; the test shows the naive CI can be several times too narrow.
 
 ## Methodological caveats (D1)
@@ -63,10 +65,10 @@ The sandbox could not reach Bluesky or Google. Tested offline only:
 
 | Component | Tested with | Not yet verified |
 |---|---|---|
-| Jetstream v1 parsing | Messages built from the field names in the Jetstream README (`did`, `time_us`, `kind`, `commit.operation/collection/rkey/record/cid`) and the post lexicon (`reply.parent/root.uri`, `embed.record.uri`, `recordWithMedia.record.record.uri`) | A real stream. Run the 2-minute smoke test and eyeball 20 rows. |
+| Jetstream v1 parsing | Synthetic messages from the Jetstream README field names, **and a live run on 3 Nov 2026** (6 x 5-minute windows on `jetstream2.us-east`, p = 0.1): kept/English matched p, zero reconnects | Eyeball 20 rows yourself before D1. |
 | Reconnect + cursor | Fake socket that drops mid-stream | Real drops, and whether the public instance honours old cursors |
 | `--protocol v2` | One documented v2 example | Everything. Use v1 (`jetstream1/2.*`) unless v1 is retired. |
-| Detoxify | Mocked module (install timed out here) | Real model download and output keys. First real run: score 5 posts and check the column names. |
+| Detoxify | Mocked module, **and a live run** (detoxify 0.5.4, torch CPU): weights download, output keys match `tox_detoxify_*` above | GPU, and the `unbiased` head |
 | Perspective | Fake HTTP (request body, 1 qps, 429 retry, 400 handling, cache) | A real key and response |
 
 **Perspective deadline.** perspectiveapi.com says the service runs until 31 December 2026 and that it stopped taking new usage requests after February 2026. Your D1 is scheduled for January 2027. If you want Perspective at all, you need an existing key and must score everything before 31 December; otherwise Detoxify is the only baseline and the paper should say so.

@@ -52,7 +52,14 @@ STATES = ["P", "M", "R", "N"]
 TRANSIENT = ["P", "M", "R", "N0", "NP", "NR"]
 ABSORBING = ["CUT", "REPAIRED", "OTHER"]
 END_OF = {"P": "CUT", "NP": "CUT", "R": "REPAIRED", "NR": "REPAIRED", "M": "OTHER", "N0": "OTHER"}
-DELTA_RE = re.compile(r"(?:\u0394|&#8710;|!delta\b)", re.IGNORECASE)
+# Literal characters, not \u escapes: pandas 3 hands regexes to pyarrow/RE2, which rejects "\u".
+# CMV deltas are usually U+2206 (INCREMENT, also written &#8710;), sometimes U+0394 (Greek capital delta).
+# Reddit text is HTML-escaped, so the entity usually arrives as "&amp;#8710;".
+DELTA_RE = re.compile("(?:\u2206|\u0394|&(?:amp;)?#(?:8710|916);|!delta\\b)", re.IGNORECASE)
+DELTABOT_CONFIRM = re.compile(r"^\s*Confirmed: \d+ delta", re.IGNORECASE)
+TOMBSTONES = {"[deleted]", "[removed]"}       # Reddit placeholders: comment deleted by user or removed
+BOTS = {"DeltaBot", "AutoModerator"}           # not participants; removed from trees by drop_bots()
+REMOVAL_NOTICE = re.compile(r"your comment has been removed", re.IGNORECASE)
 UTT_COLS = ["id", "conversation_id", "reply_to", "speaker", "text", "timestamp"]
 
 
@@ -77,7 +84,18 @@ def load_convokit(name: str, max_conversations: int | None = None, seed: int = 0
     if max_conversations:
         convs = df["conversation_id"].drop_duplicates().sample(frac=1, random_state=seed)
         df = df[df["conversation_id"].isin(set(convs[:max_conversations]))]
-    return df.reset_index(drop=True)
+    return _arrow_safe_meta(df.reset_index(drop=True))
+
+
+def _arrow_safe_meta(df: pd.DataFrame) -> pd.DataFrame:
+    """Meta fields can mix types (CMV 'edited' is False or an edit timestamp), which parquet rejects.
+    Cast any meta_ column holding more than one non-null Python type to string, keeping nulls."""
+    df = df.copy()
+    for c in [c for c in df.columns if c.startswith("meta_")]:
+        types = {type(v) for v in df[c] if v is not None and not (isinstance(v, float) and np.isnan(v))}
+        if len(types) > 1:
+            df[c] = df[c].map(lambda v: None if v is None or (isinstance(v, float) and np.isnan(v)) else str(v))
+    return df
 
 
 def load_csv(path: str | Path) -> pd.DataFrame:
@@ -89,7 +107,8 @@ def load_csv(path: str | Path) -> pd.DataFrame:
 
 
 def clean(df: pd.DataFrame) -> pd.DataFrame:
-    """Normalise reply_to (NaN/'' -> None) and drop replies whose parent is absent (deleted or out of sample)."""
+    """Normalise reply_to (NaN/'' -> None) and drop replies whose parent is absent (out of sample, or deleted
+    in corpora that drop deleted comments; ConvoKit CMV keeps them as tombstones, see deletion_report)."""
     df = df.copy()
     df["reply_to"] = df["reply_to"].where(df["reply_to"].notna() & (df["reply_to"].astype(str) != ""), None)
     ids = set(df["id"])
@@ -106,25 +125,83 @@ def clean(df: pd.DataFrame) -> pd.DataFrame:
 # ---------------------------------------------------------------- deltas (CMV)
 
 def mark_deltas(df: pd.DataFrame) -> pd.DataFrame:
-    """delta_award: utterance by the conversation's OP containing a delta token.
-    delta_received: the utterance that award replies to. Bot confirmations are ignored because they are
-    not by the OP. Verify against the corpus's own success/delta metadata where it exists."""
+    """delta_award: utterance by the conversation's OP that contains a delta token OR that DeltaBot confirmed
+    ("Confirmed: 1 delta awarded to ..." as a direct reply). delta_received: the utterance that award replies
+    to. Run BEFORE drop_bots(), which removes the confirmations. delta_bot_confirmed is kept separately so the
+    regex can be checked against the bot (see delta_check)."""
     df = df.copy()
     roots = df[df["reply_to"].isna()].set_index("conversation_id")["speaker"]
     op = df["conversation_id"].map(roots)
-    df["delta_award"] = (df["speaker"] == op) & df["text"].fillna("").str.contains(DELTA_RE)
+    text = df["text"].fillna("").astype(str)
+    confirmed = set(df.loc[(df["speaker"] == "DeltaBot") & text.str.contains(DELTABOT_CONFIRM), "reply_to"].dropna())
+    df["delta_bot_confirmed"] = df["id"].isin(confirmed)
+    df["delta_token"] = text.str.contains(DELTA_RE)
+    df["delta_award"] = (df["speaker"] == op) & (df["delta_token"] | df["delta_bot_confirmed"])
     recv = set(df.loc[df["delta_award"], "reply_to"].dropna())
     df["delta_received"] = df["id"].isin(recv)
     return df
+
+
+def delta_check(df: pd.DataFrame) -> dict:
+    """Agreement between the OP-token rule and DeltaBot confirmations of OP awards (needs mark_deltas output)."""
+    roots = df[df["reply_to"].isna()].set_index("conversation_id")["speaker"]
+    is_op = df["speaker"] == df["conversation_id"].map(roots)
+    tok, bot = is_op & df["delta_token"], is_op & df["delta_bot_confirmed"]
+    return {"op_token": int(tok.sum()), "op_bot_confirmed": int(bot.sum()), "both": int((tok & bot).sum()),
+            "token_recall_vs_bot": float((tok & bot).sum() / bot.sum()) if bot.sum() else float("nan"),
+            "awards": int(df["delta_award"].sum())}
+
+
+def drop_bots(df: pd.DataFrame, bots: set[str] = BOTS) -> tuple[pd.DataFrame, int]:
+    """Remove bot utterances and re-attach their replies to the bot's parent, so no human turn is orphaned.
+    Bots are not participants: left in, they pad trees with N leaves and inflate mean_replies."""
+    is_bot = df["speaker"].isin(bots) & df["reply_to"].notna()
+    if not is_bot.any():
+        return df, 0
+    parent = dict(zip(df.loc[is_bot, "id"], df.loc[is_bot, "reply_to"]))
+
+    def up(p):
+        while p in parent:
+            p = parent[p]
+        return p
+
+    out = df[~is_bot].copy()
+    out["reply_to"] = out["reply_to"].map(lambda p: None if p is None else up(p))
+    return out.reset_index(drop=True), int(is_bot.sum())
+
+
+def is_tombstone(df: pd.DataFrame) -> pd.Series:
+    return df["text"].fillna("").astype(str).str.strip().isin(TOMBSTONES)
+
+
+def deletion_report(df: pd.DataFrame, n_orphans_dropped: int = 0) -> dict:
+    """How much of each tree is missing. ConvoKit keeps deleted comments in place as "[deleted]" tombstones
+    (so their replies are NOT orphans); orphans only arise from out-of-sample parents. Moderator removal
+    notices are counted by rule, because Rule 2 (rude/hostile) removals are the H2 truncation that matters."""
+    rep = df["reply_to"].notna()
+    tomb = is_tombstone(df) & rep
+    kids = set(df["reply_to"].dropna())
+    notices = df.loc[df["text"].fillna("").astype(str).str.contains(REMOVAL_NOTICE), "text"].astype(str)
+    rules = notices.str.extract(r"(?:Comment )?Rule (\d)", expand=False).fillna("?").value_counts().to_dict()
+    open_ = rep & df["reply_to"].isin(set(df.loc[df["reply_to"].isna(), "id"]))
+    return {"replies": int(rep.sum()), "tombstones": int(tomb.sum()),
+            "tombstone_share": float(tomb.sum() / rep.sum()) if rep.sum() else float("nan"),
+            "tombstones_with_replies": int((tomb & df["id"].isin(kids)).sum()),
+            "openings": int(open_.sum()), "opening_tombstones": int((tomb & open_).sum()),
+            "speaker_deleted_text_kept": int((rep & (df["speaker"] == "[deleted]") & ~tomb).sum()),
+            "removal_notices_by_rule": {f"rule_{k}": int(v) for k, v in sorted(rules.items())},
+            "orphans_dropped": int(n_orphans_dropped)}
 
 
 # ---------------------------------------------------------------- export for labelling
 
 def export_for_labelling(df: pd.DataFrame, out: Path, skip_roots: bool = True, max_chars: int = 2000) -> int:
     """Write a CSV label_pilot.py can read (post_id, text, parent_text, stratum). OP root posts are skipped by
-    default: in CMV they are long view statements, not replies, and the codebook is built for replies."""
+    default: in CMV they are long view statements, not replies, and the codebook is built for replies.
+    Tombstones ("[deleted]") are skipped; they stay in the tree as N."""
     text = df.set_index("id")["text"]
     rows = df[df["reply_to"].notna()] if skip_roots else df
+    rows = rows[~is_tombstone(rows)]  # "[deleted]" has nothing to label; don't pay for it
     with open(out, "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=["post_id", "stratum", "text", "parent_text"])
         w.writeheader()
@@ -158,8 +235,9 @@ def attach_states(df: pd.DataFrame, labels: pd.DataFrame | None) -> pd.DataFrame
         df["state"] = "N"
         return df
     lab = labels.set_index(labels["post_id"].astype(str))
-    cat = df["id"].map(lab["category"]) if "category" in lab else None
-    rep = df["id"].map(lab["repair_attempt"]) if "repair_attempt" in lab else pd.Series([None] * len(df))
+    none = pd.Series([None] * len(df), index=df.index)
+    cat = df["id"].map(lab["category"]) if "category" in lab else none
+    rep = df["id"].map(lab["repair_attempt"]) if "repair_attempt" in lab else none
     df["state"] = [state_from_label(c, r) for c, r in zip(cat, rep)]
     df["labelled"] = df["id"].isin(lab.index)
     return df
@@ -206,6 +284,31 @@ def subtree_ids(root: str, ch: dict[str, list[str]]) -> list[str]:
         out.append(n)
         stack.extend(ch.get(n, []))
     return out
+
+
+def tree_shapes(df: pd.DataFrame) -> pd.DataFrame:
+    """One row per conversation: size, openings (top-level replies), max depth, leaves, mean branching of
+    internal reply nodes, and the share of utterances in the largest opening's sub-thread."""
+    ch = children_map(df)
+    rows = []
+    for conv, g in df.groupby("conversation_id"):
+        root = g.loc[g["reply_to"].isna(), "id"]
+        if len(root) != 1:
+            continue
+        stack, max_d = [(root.iloc[0], 0)], 0
+        while stack:
+            n, d = stack.pop()
+            max_d = max(max_d, d)
+            stack.extend((k, d + 1) for k in ch.get(n, []))
+        ops = ch.get(root.iloc[0], [])
+        sizes = [len(subtree_ids(o, ch)) for o in ops]
+        reps = g[g["reply_to"].notna()]
+        n_kids = np.array([len(ch.get(i, [])) for i in reps["id"]])
+        rows.append({"conversation_id": conv, "utterances": len(g), "openings": len(ops), "max_depth": max_d,
+                     "leaves": int((n_kids == 0).sum()),
+                     "branching_internal": float(n_kids[n_kids > 0].mean()) if (n_kids > 0).any() else np.nan,
+                     "largest_subthread_share": max(sizes) / (len(g) - 1) if sizes else np.nan})
+    return pd.DataFrame(rows)
 
 
 # ---------------------------------------------------------------- gain g
@@ -368,12 +471,19 @@ def _fmt_tab(t: pd.DataFrame) -> str:
 
 def cmd_load(a):
     df = load_convokit(a.corpus, a.max_conversations, a.seed) if a.corpus else load_csv(a.csv)
+    n0 = len(df)
     df = mark_deltas(clean(df))
+    n_orphans = n0 - len(df)
+    dc = delta_check(df)
+    df, n_bots = drop_bots(df) if not a.keep_bots else (df, 0)
     out = Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     df.to_parquet(out) if out.suffix == ".parquet" else df.to_csv(out, index=False)
     print(f"{len(df)} utterances, {df['conversation_id'].nunique()} conversations, "
-          f"{int(df['delta_award'].sum())} delta awards -> {out}")
+          f"{dc['awards']} delta awards -> {out}")
+    print(f"bots removed: {n_bots}  |  OP delta tokens {dc['op_token']}, DeltaBot-confirmed OP awards "
+          f"{dc['op_bot_confirmed']}, token recall vs bot {dc['token_recall_vs_bot']:.0%}")
+    print("deletion:", deletion_report(df, n_orphans))
 
 
 def _read_utts(path: str) -> pd.DataFrame:
@@ -400,17 +510,32 @@ def cmd_analyse(a):
         if not a.labels:
             sys.exit("--labels (label_pilot.py output) or --stub-labels is required")
         df = attach_states(df, pd.read_csv(a.labels, dtype={"post_id": str}))
-        cover = df.loc[df["reply_to"].notna(), "labelled"].mean()
+        cover = df.loc[df["reply_to"].notna() & ~is_tombstone(df), "labelled"].mean()  # tombstones aren't exported
         print(f"label coverage of replies: {cover:.1%}  (unlabelled replies count as N; keep this near 100%)\n")
         if cover < 0.95:
             print("!! coverage < 95%: g and endings are biased towards N. Label whole conversations, not samples.\n")
 
     print("State counts (replies):\n", df.loc[df["reply_to"].notna(), "state"].value_counts().to_string(), "\n")
+    dr = deletion_report(df)
+    print(f"Deletion: {dr['tombstones']}/{dr['replies']} replies are tombstones ({dr['tombstone_share']:.1%}); "
+          f"{dr['opening_tombstones']}/{dr['openings']} openings; {dr['tombstones_with_replies']} tombstones have "
+          f"replies; mod removal notices {dr['removal_notices_by_rule']}; orphans {dr['orphans_dropped']}")
+    st = df.set_index("id")["state"]
+    rp = df[df["reply_to"].notna()].assign(parent_state=lambda d: d["reply_to"].map(st), tomb=lambda d: is_tombstone(d))
+    print("Tombstone share of replies by parent state (H2 plan, threat 3; tombstones are N, so read with care):")
+    print(_fmt_tab(rp.groupby("parent_state")["tomb"].agg(["mean", "size"]).rename(columns={"mean": "share", "size": "n"})))
+    ts = tree_shapes(df)
+    print("\nTree shapes (per conversation):")
+    print(_fmt_tab(ts.drop(columns="conversation_id").describe(percentiles=[0.5]).T[["mean", "min", "50%", "max"]]))
+    emp0 = chain_endings(df)
+    print("Root-to-leaf chain length (turns from opening):",
+          emp0["length"].describe(percentiles=[0.5, 0.9]).round(1)[["count", "mean", "50%", "90%", "max"]].to_dict(), "\n")
     gt = gain_with_ci(df, a.n_boot, a.seed)
     print("Gain by parent state (g = mean punitive replies per post; 95% CI resamples conversations):")
     print(_fmt_tab(gt))
     r, lo, hi = gt.attrs["gP_over_gM"]
-    print(f"\ng_P / g_M = {r:.2f} [{lo:.2f}, {hi:.2f}]   (H2a: > 1)\n")
+    note = "   (undefined: g_M = 0)" if not gt.loc["M", "g"] else ""
+    print(f"\ng_P / g_M = {r:.2f} [{lo:.2f}, {hi:.2f}]   (H2a: > 1){note}\n")
 
     res = absorbing_analysis(transition_counts(df), alpha=a.smooth)
     print("Transition matrix (random walk down the tree):\n" + _fmt_tab(res["T"]))
@@ -433,6 +558,7 @@ def cmd_analyse(a):
         res["ending_probs"].to_csv(od / "ending_probs.csv")
         emp.to_csv(od / "chain_endings.csv", index=False)
         oo.to_csv(od / "opening_outcomes.csv", index=False)
+        ts.to_csv(od / "tree_shapes.csv", index=False)
         print(f"\ntables -> {od}/")
 
 
@@ -446,6 +572,7 @@ def main(argv=None):
     p.add_argument("--max-conversations", type=int, default=None)
     p.add_argument("--seed", type=int, default=7)
     p.add_argument("--out", default="data/cmv_utts.parquet")
+    p.add_argument("--keep-bots", action="store_true", help="keep DeltaBot/AutoModerator turns in the trees")
     p.set_defaults(fn=cmd_load)
     p = sub.add_parser("export", help="utterance table -> CSV for label_pilot.py")
     p.add_argument("--utts", default="data/cmv_utts.parquet")

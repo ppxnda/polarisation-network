@@ -166,3 +166,50 @@ def test_attach_states_from_label_csv():
     out = C.attach_states(df, labels).set_index("id")
     assert out.loc["a", "state"] == "P" and out.loc["c", "state"] == "R" and out.loc["d", "state"] == "M"
     assert out.loc["g", "state"] == "N" and not out.loc["g", "labelled"]
+
+
+# ---------------------------------------------------------------- regressions from the first live CMV run
+
+def test_delta_regex_html_escaped_and_increment_sign():
+    for t in ["&amp;#8710; good point", "here, ∆", "Δ for you", "&#8710;", "!delta"]:
+        assert C.DELTA_RE.search(t), t
+    # pandas 3 sends str.contains to pyarrow/RE2, which rejected the old "\u" escape
+    s = pd.Series(["&amp;#8710;", "no"], dtype="string[pyarrow]")
+    assert s.str.contains(C.DELTA_RE).tolist() == [True, False]
+
+
+def test_deltabot_confirmation_counts_and_bots_are_reparented():
+    df = tree([("r", None), ("x", "r"), ("y", "x"), ("bot", "y"), ("z", "bot")], {},
+              texts={"y": "ok you convinced me", "bot": "Confirmed: 1 delta awarded to /u/u_x."},
+              speakers={"r": "op", "y": "op", "bot": "DeltaBot"})
+    df = C.mark_deltas(df)
+    assert df.set_index("id").loc["y", "delta_award"]          # no token, but the bot confirmed it
+    assert df.set_index("id").loc["x", "delta_received"]
+    assert C.delta_check(df)["op_bot_confirmed"] == 1
+    out, n = C.drop_bots(df)
+    assert n == 1 and "bot" not in set(out["id"])
+    assert out.set_index("id").loc["z", "reply_to"] == "y"      # bot's reply moves up, not orphaned
+
+
+def test_deletion_report_counts_tombstones_not_orphans():
+    df = tree([("r", None), ("a", "r"), ("b", "a"), ("c", "r"), ("m", "c")], {},
+              texts={"a": "[deleted]", "c": "[removed]", "m": "Sorry u, your comment has been removed: Comment Rule 2."})
+    rep = C.deletion_report(C.clean(df))
+    assert rep["tombstones"] == 2 and rep["opening_tombstones"] == 2 and rep["tombstones_with_replies"] == 2
+    assert rep["removal_notices_by_rule"] == {"rule_2": 1} and rep["orphans_dropped"] == 0
+
+
+def test_export_skips_tombstones(tmp_path):
+    df = tree([("r", None), ("a", "r"), ("b", "a")], {}, texts={"a": "[deleted]", "b": "reply"})
+    n = C.export_for_labelling(df, tmp_path / "x.csv")
+    assert n == 1 and pd.read_csv(tmp_path / "x.csv")["post_id"].tolist() == ["b"]
+
+
+def test_tree_shapes_hand_tree():
+    ts = C.tree_shapes(tree(EDGES, STATES)).iloc[0]
+    assert (ts.utterances, ts.openings, ts.max_depth, ts.leaves) == (8, 3, 3, 3)
+
+
+def test_mixed_type_meta_is_parquet_safe(tmp_path):
+    df = pd.DataFrame({"id": ["a", "b"], "meta_edited": [False, 1417935399.0]})
+    C._arrow_safe_meta(df).to_parquet(tmp_path / "m.parquet")

@@ -431,6 +431,26 @@ def test_iceberg_cli_join(tmp_path, capsys):
     assert tab.set_index("category").loc[4, "share_below_0.5"] == 0.0
 
 
+def test_iceberg_all_posts_needs_no_labels(tmp_path, capsys):
+    df = pd.DataFrame({"did": ["a", "a", "b", "c"], "tox_detoxify_toxicity": [0.1, 0.6, 0.8, 0.2]})
+    r = st.iceberg(df, "tox_detoxify_toxicity", thresholds=[0.5], punitive=None, cluster_col="did").iloc[0]
+    assert r.n_punitive == 4 and r.share_below == 0.5
+    df.to_csv(tmp_path / "sc.csv", index=False)
+    st.main(["iceberg", "--input", str(tmp_path / "sc.csv"), "--all-posts", "--cluster-col", "did", "--n-boot", "50"])
+    out = capsys.readouterr().out
+    assert "all posts" in out and "3 distinct did" in out and "2/4 = 0.500" in out
+    with pytest.raises(SystemExit):
+        st.main(["iceberg", "--input", str(tmp_path / "sc.csv"), "--all-posts", "--cluster-col", "author"])
+
+
+def test_score_drop_text(fake_detoxify, tmp_path):
+    inp = tmp_path / "in.csv"
+    pd.DataFrame({"post_id": ["p1"], "text": ["idiot"]}).to_csv(inp, index=False)
+    st.main(["score", "--input", str(inp), "--output", str(tmp_path / "out.csv"), "--drop-text"])
+    out = pd.read_csv(tmp_path / "out.csv")
+    assert "text" not in out.columns and out["tox_detoxify_toxicity"].tolist() == [0.9]
+
+
 def test_real_websockets_against_local_server(tmp_path):
     """Exercises default_connect and the real websockets client against a local server (no internet)."""
     from websockets.asyncio.server import serve
