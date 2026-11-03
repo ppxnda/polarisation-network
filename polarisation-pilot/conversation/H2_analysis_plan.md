@@ -55,18 +55,18 @@ H2d exists because Vuyyuru & Jahanbakhsh (2026) find that opening misalignment d
 
 1. **Selection into the opening state.** Who writes a punitive opening, and on which topics, isn't random. The within-post fixed effect in H2c compares openings to *the same OP and the same view*, which removes topic and OP stubbornness. Commenter traits remain; add commenter random effects if the data allow.
 2. **Post-treatment controls.** Don't control for thread length or number of replies. They are outcomes of the opening.
-3. **CMV Rule 2 removes rude comments, which is the biggest caveat.** Moderators delete hostile comments, so the most punitive turns are missing. `clean()` drops orphans and reports how many. CMV is therefore a **conservative, truncated** test: what remains is punitive content polite enough to survive moderation. That is the iceberg (D1) in a different form, so it's arguably a feature. Still, report the deletion rate by opening state, and don't compare raw CMV prevalence with Bluesky.
+3. **CMV Rule 2 removes rude comments, which is the biggest caveat.** Moderators delete hostile comments, so the most punitive turns are missing. ConvoKit keeps deleted comments in place as `[deleted]` tombstones, so their replies are *not* orphans and `clean()` will report zero; `deletion_report()` (printed by `load` and `analyse`) counts tombstones, deleted openings and moderator removal notices by rule. Tombstones stay in trees as N and are not exported for labelling. CMV is therefore a **conservative, truncated** test: what remains is punitive content polite enough to survive moderation. That is the iceberg (D1) in a different form, so it's arguably a feature. Still, report the deletion rate by opening state, and don't compare raw CMV prevalence with Bluesky.
 4. **The codebook was built for short posts.** CMV comments are long. Before trusting any number, hand-label about 50 CMV replies and run `label_pilot.py agree` against the LLM labels. `export` truncates to 2,000 characters; check how often truncation cuts the punitive part.
 5. **Label whole conversations, not a random sample of utterances.** Any unlabelled reply counts as N, which biases g towards zero and endings towards OTHER. `analyse` warns below 95% coverage. Sample *conversations*, then label everything in them.
 6. **Baselines.** H2a and H2c must survive adding: the opening's Detoxify toxicity; ConvoKit politeness strategies (the Conversations Gone Awry pragmatic cues, Zhang et al. 2018); and an outrage score (Brady's classifier if you can obtain it). Otherwise the result is "rude openings go badly", which is already known.
 7. **Concession is not repair.** Musi et al. (2018) find concessions equally common in winning and losing CMV arguments. Report R both as coded (`repair_attempt`) and with concessions split off, if the pilot shows the codebook conflates them.
-8. **Deltas.** `mark_deltas` counts a Δ or `!delta` posted by the OP. Check this against the corpus's own metadata (Winning Args has success labels). Deltas measure *OP* persuasion only, not the commenter's.
+8. **Deltas.** `mark_deltas` counts an OP comment with ∆ (U+2206), Δ, `&amp;#8710;` (Reddit HTML-escapes it) or `!delta`, or one that DeltaBot confirmed; `load` prints the token rule's recall against DeltaBot. Bots (DeltaBot, AutoModerator) are then removed from trees, re-attaching any replies to the bot's parent. Deltas measure *OP* persuasion only, not the commenter's.
 
 ## 5. Run order
 
 ```powershell
 pip install convokit pandas numpy pyarrow pytest
-python -m pytest conversation/tests             # 11 offline tests
+python -m pytest conversation/tests             # 17 offline tests
 
 # 1. Data (needs internet; the Winning Args corpus is large, so start small)
 python conversation/chains.py load --corpus winning-args-corpus --max-conversations 50 --out data/cmv_utts.parquet
@@ -89,4 +89,5 @@ The export uses the same columns as `pilot_sample.csv` (`post_id, stratum, text,
 
 - The **H2c conditional logit** isn't implemented yet. `opening_outcomes.csv` holds everything it needs: `statsmodels` `ConditionalLogit(delta, dummies(opening_state), groups=conversation_id)`. It isn't worth building before real labels exist.
 - **The Bluesky adapter.** `load --csv` takes any table with `id, conversation_id, reply_to, text`. For Bluesky, `conversation_id` is the thread root URI and `reply_to` is the parent URI. Both must go through the **same** salted hash so that links survive pseudonymisation.
-- **Not tested on live data.** Every test uses hand-built or simulated trees. On simulated data with a known g_P = 0.45, the estimate was 0.47 (60 conversations).
+- **Live CMV run (3 Nov 2026)**: 50 Winning Args conversations load and `analyse --stub-labels` runs end to end. The Winning Args trees never go deeper than 10 turns below the root, which looks like a collection cap: chain endings at depth 10 may be truncation, not real endings.
+- **Offline tests** use hand-built or simulated trees. On simulated data with a known g_P = 0.45, the estimate was 0.47 (60 conversations).

@@ -210,12 +210,16 @@ def iceberg(df: pd.DataFrame, score_col: str, category_col: str = "category",
             thresholds: Iterable[float] = (0.5, 0.7), punitive: Iterable[int] = PUNITIVE,
             n_boot: int = 2000, seed: int = 7, cluster_col: str | None = None) -> pd.DataFrame:
     """Share of punitive posts (category in `punitive`) with score < threshold, plus percentile bootstrap 95% CI.
+    `punitive=None` uses every row (no labels needed): the share of ALL posts below threshold, a baseline.
 
     If `cluster_col` is given (e.g. the author pseudonym `did`), resamples clusters rather than posts, because
     posts by the same author are not independent. Rows with a missing score are dropped and counted.
     """
-    cat = pd.to_numeric(df[category_col], errors="coerce")
-    sub = df[cat.isin(list(punitive))]
+    if punitive is None:
+        sub = df
+    else:
+        cat = pd.to_numeric(df[category_col], errors="coerce")
+        sub = df[cat.isin(list(punitive))]
     scores = pd.to_numeric(sub[score_col], errors="coerce")
     n_missing = int(scores.isna().sum())
     keep = scores.notna()
@@ -279,6 +283,8 @@ def cmd_score(a) -> None:
     if not scorers:
         sys.exit("Nothing to do: Detoxify disabled and --perspective not set.")
     out = add_scores(df, a.text_col, scorers)
+    if a.drop_text:
+        out = out.drop(columns=[a.text_col])
     write_table(out, a.output)
     print(f"Wrote {len(out)} rows with {sum(c.startswith('tox_') for c in out.columns)} tox_ columns to {a.output}")
 
@@ -294,15 +300,21 @@ def cmd_iceberg(a) -> None:
         cols = [a.id_col] + [c for c in sc.columns if c.startswith("tox_") or c == a.cluster_col]
         df = lab.merge(sc[[c for c in dict.fromkeys(cols) if c in sc.columns]], on=a.id_col, how="inner")
         print(f"Joined {len(df)} rows on {a.id_col} ({len(lab)} labels, {len(sc)} scored).")
+    if a.cluster_col and a.cluster_col not in df.columns:
+        sys.exit(f"--cluster-col {a.cluster_col!r} not found; columns are {list(df.columns)}")
     res = iceberg(df, a.score_col, a.category_col, a.thresholds, n_boot=a.n_boot, seed=a.seed,
-                  cluster_col=a.cluster_col)
-    print(f"\nIceberg: punitive (categories 1-2) posts scoring below threshold on {a.score_col}")
+                  cluster_col=a.cluster_col, punitive=None if a.all_posts else PUNITIVE)
+    if a.cluster_col:
+        print(f"Clusters: {df[a.cluster_col].nunique()} distinct {a.cluster_col} for {len(df)} rows "
+              f"(CI resamples {a.cluster_col}, not rows).")
+    what = "all posts" if a.all_posts else "punitive (categories 1-2) posts"
+    print(f"\nIceberg: {what} scoring below threshold on {a.score_col}")
     for _, r in res.iterrows():
         print(f"  < {r.threshold:.2f}: {int(r.n_below)}/{int(r.n_punitive)} = {r.share_below:.3f} "
               f"(95% CI {r.ci_low:.3f} to {r.ci_high:.3f})")
     if res.n_missing_score.iloc[0]:
-        print(f"  ({int(res.n_missing_score.iloc[0])} punitive rows had no score and were dropped)")
-    if a.by_category:
+        print(f"  ({int(res.n_missing_score.iloc[0])} rows had no score and were dropped)")
+    if a.by_category and not a.all_posts:
         print("\nShare below threshold, all categories:")
         print(share_below_by_category(df, a.score_col, a.category_col, a.thresholds).to_string(index=False))
     if a.output:
@@ -325,6 +337,7 @@ def main(argv: list[str] | None = None) -> None:
     s.add_argument("--perspective", action="store_true", help="also call Perspective (PERSPECTIVE_API_KEY)")
     s.add_argument("--qps", type=float, default=1.0, help="Perspective requests per second (default quota is 1)")
     s.add_argument("--cache", default=None, help="Perspective cache file (default next to --output)")
+    s.add_argument("--drop-text", action="store_true", help="omit the text column from --output (ethics)")
     s.set_defaults(func=cmd_score)
 
     i = sub.add_parser("iceberg", help="share of punitive posts below a toxicity threshold")
@@ -339,6 +352,8 @@ def main(argv: list[str] | None = None) -> None:
     i.add_argument("--seed", type=int, default=7)
     i.add_argument("--cluster-col", default=None, help="e.g. did: bootstrap by author, not by post")
     i.add_argument("--by-category", action="store_true", help="also show share below for categories 1-6")
+    i.add_argument("--all-posts", action="store_true",
+                   help="no labels: share of ALL rows below threshold (needs only --input with scores)")
     i.add_argument("--output", default=None)
     i.set_defaults(func=cmd_iceberg)
 
