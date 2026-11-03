@@ -1,0 +1,6 @@
+websockets>=13
+pandas>=2.0
+pyarrow>=14
+numpy
+detoxify>=0.5
+pytest
