@@ -59,4 +59,4 @@ python label_pilot.py agree --a data/gold_jesse.csv --b data/llm_labels.csv
 - The labeller was tested end to end with synthetic labels, not live API calls. `sync --limit 5` is the first real test.
 - `DEFAULT_MODEL` in `label_pilot.py` may need changing to a model shown in your Console.
 - Toxicity scoring and the random (non-keyword) sampler for D1 are in `tools/` (see `tools/TOOLS.md`). **Perspective API shuts down on 31 Dec 2026**: score anything you need before then, or use Detoxify.
-- A conversation-layer prototype (CMV, gain g, cut/repaired chains) lives in `conversation/` once added; the toy reservoir model is in `model/`.
+- Conversation layer (CMV, gain g, cut/repaired chains as an absorbing Markov chain) is in `conversation/`: `chains.py`, 11 offline tests, and `H2_analysis_plan.md`. Not yet run on live CMV data. The toy reservoir model is in `model/`.
