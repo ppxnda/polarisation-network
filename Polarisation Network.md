@@ -19,6 +19,15 @@ build-type: model
 ---
 ## Log
 
+- **2026-11-03** Codebook v0 drafted (one file = human codebook + LLM prompt), then v0.2 after an independent red-team review (`polarisation-pilot/codebook_review.md`, 60 hard cases held out in `hard_cases.csv`). Category 4 retired in favour of a separate `identity_attack` axis.
+- **2026-11-03** Pilot scripts built (keyword sampler, labeller, agreement), plus `tools/` (random Jetstream sampler for D1, toxicity scorer). None run against live Bluesky or the API yet.
+- **2026-11-03** Lit rounds 1–2 ([[Polarisation Gap Matrix]], [[Polarisation Lit Round 2]]). N1 open but crowded (state the triple: deservingness licence, separation from identity hate/outrage/UCC, sub-threshold prevalence on a non-keyword sample). N2 narrowed by Guo et al. 2026 (sign edges by punitiveness vs stance vs toxicity on the same edge set; score on an independent outcome). N3 narrowed to a mechanism-plus-data claim (Klingborg et al. 2026, Sznajd-Weron group). N4 is the integration chapter, not a paper novelty claim.
+- **2026-11-03** H7 at risk from Guo et al.'s lagged-forecast null. Redesign as a pre-registered, event-locked pooled study with persistence baselines.
+- **2026-11-03** Perspective API retires 31 Dec 2026. Use Detoxify as the primary toxicity baseline; score anything that needs Perspective before then.
+- **2026-11-03** Toy reservoir model (`polarisation-pilot/model/`): fold for 2.03 < Π < 4.83; policy alone has a minimum duration of about one repair time. **Decision pending:** "policy and culture are complements" holds only in a narrow band; the sharper claim is "policy buys time and cuts inflow; only repair raises the drain ceiling". Pick one for the one-line argument.
+- **2026-11-03** Normal-form note: near a fold the recovery *rate* scales as √distance (slope +½ on log-log); the recovery *time* has slope −½. Fix wherever the design doc states this.
+- **2026-11-03** Conversation layer prototype (`polarisation-pilot/conversation/`): gain g, cut/repaired endings as an absorbing Markov chain, H2 plan. Key caveat: CMV Rule 2 removes rude comments, so CMV is a truncated, conservative test.
+
 ## Notes
 
 Ask part of your capstone for part of the analysis your should contact:
@@ -185,7 +194,7 @@ Read these (whole or the named parts); everything else in the layer lists below 
 | Data | Jetstream, atproto SDK, ConvoKit, X pay-per-use (elite timelines), GDELT, Hansard API |
 | Storage | Parquet + DuckDB |
 | Labelling | Claude Batch API, Label Studio, krippendorff |
-| NLP | transformers, datasets, Detoxify / Perspective, Mformer |
+| NLP | transformers, datasets, Detoxify (Perspective retires 31 Dec 2026), Mformer |
 | Network | networkx, igraph + leidenalg |
 | Stats | statsmodels, bambi, lifelines, ewstools |
 | Modelling | NumPy + Numba, SciPy, sbi, SALib |
